@@ -1,84 +1,30 @@
+<!-- App.vue -->
 <template>
+ 
   <div>
-    <table v-if="loaded">
-      <thead>
-        <tr>
-          <th>ФИО</th>
-          <th>Площадь</th>
-          <th>Дата Регистрации</th>
-          <!-- Другие заголовки таблицы -->
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="item in items" :key="item.id">
-          <td>{{ item.fio }}</td>
-          <td>{{ item.area }}</td>
-          <td>{{ item.start_date }}</td>
-          <!-- Другие данные из объекта item -->
-        </tr>
-      </tbody>
-    </table>
-    <div v-else class="loading">Загрузка...</div>
+    <ResidentsTable />
+    <!-- Другой контент приложения -->
   </div>
 </template>
 
 <script>
+import ResidentsTable from './components/ResidentsTable.vue';
+
 export default {
-  data() {
-    return {
-      items: [],
-      loaded: false
-    };
-  },
-  created() {
-    this.fetchItems();
-  },
-  methods: {
-    fetchItems() {
-      fetch('http://localhost:8000/api/residents')
-        .then(response => {
-          if (!response.ok) {
-            throw new Error('Network response was not ok');
-          }
-          return response.json();
-        })
-        .then(data => {
-          this.items = data;
-          this.loaded = true;
-        })
-        .catch(error => {
-          console.error('There was a problem with the fetch operation:', error);
-          this.loaded = true;
-        });
-    }
+  components: {
+    ResidentsTable
   }
 };
 </script>
 
 <style>
-.table-container {
-  display: flex;
-  justify-content: flex-end; /* Выравнивание в правой части контейнера */
-}
-
-table {
-  border-collapse: collapse;
-  border: 1px solid #ddd; /* Рамка вокруг всей таблицы */
-  margin-left: auto; /* Для выравнивания таблицы справа */
-}
-
-th, td {
-  padding: 8px;
-  text-align: left;
-  border: 1px solid #ddd; /* Рамки вокруг ячеек */
-}
-
-th {
-  background-color: #eee;
-}
-
-.loading {
+/* Стили для App.vue */
+#app {
+  font-family: Avenir, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   text-align: center;
-  padding: 20px;
+  color: #2c3e50;
+  margin-top: 60px;
 }
 </style>
