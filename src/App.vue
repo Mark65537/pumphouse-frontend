@@ -4,8 +4,8 @@
       <thead>
         <tr>
           <th>ФИО</th>
-          <th>Район</th>
-          <th>Дата начала</th>
+          <th>Площадь</th>
+          <th>Дата Регистрации</th>
           <!-- Другие заголовки таблицы -->
         </tr>
       </thead>
@@ -56,16 +56,21 @@ export default {
 </script>
 
 <style>
-/* Стили остаются без изменений */
+.table-container {
+  display: flex;
+  justify-content: flex-end; /* Выравнивание в правой части контейнера */
+}
+
 table {
-  width: 100%;
   border-collapse: collapse;
+  border: 1px solid #ddd; /* Рамка вокруг всей таблицы */
+  margin-left: auto; /* Для выравнивания таблицы справа */
 }
 
 th, td {
   padding: 8px;
   text-align: left;
-  border-bottom: 1px solid #ddd;
+  border: 1px solid #ddd; /* Рамки вокруг ячеек */
 }
 
 th {
