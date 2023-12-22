@@ -81,10 +81,64 @@ export default {
 </script>
 
 <style>
-.rounded-table {
-  /* Стили для таблицы с закругленными углами */
-}
+/* Стили для компонента Pagination-controls */
 .pagination-controls {
-  /* Стили для элементов управления пагинацией */
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
 }
+
+.pagination-controls select {
+  padding: 5px;
+}
+
+.pagination-controls button {
+  padding: 5px 10px;
+}
+
+/* Стили для компонента Table */
+table {
+  border-collapse: collapse;
+  border: 1px solid #ddd; /* Рамка вокруг всей таблицы */
+  margin-left: auto; /* Для выравнивания таблицы справа */
+}
+
+th, td {
+  padding: 8px;
+  text-align: left;
+  border: 1px solid #ddd; /* Рамки вокруг ячеек */
+}
+
+th {
+  background-color: #eee;
+}
+
+
+/* Стили для компонента Rounded-table */
+.rounded-table {
+  border-collapse: separate;
+  border-spacing: 0;
+  border-radius: 10px; /* Закругление углов таблицы */
+  overflow: hidden; /* Скрывает содержимое, выходящее за границы элемента */
+}
+
+.rounded-table th,
+.rounded-table td {
+  border-bottom: 1px solid #ddd; /* Границы для ячеек */
+}
+
+.rounded-table th:first-child,
+.rounded-table td:first-child {
+  border-left: 1px solid #ddd; /* Границы для крайнего левого столбца */
+}
+
+.rounded-table th:last-child,
+.rounded-table td:last-child {
+  border-right: 1px solid #ddd; /* Границы для крайнего правого столбца */
+}
+
+.rounded-table th {
+  border-top: 1px solid #ddd; /* Границы для заголовка таблицы */
+}
+
 </style>

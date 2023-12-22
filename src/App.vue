@@ -1,17 +1,22 @@
 <!-- App.vue -->
 <template>
- 
+
   <div>
-    <ResidentsTable />
-    <!-- Другой контент приложения -->
+    <TopBar />
+  </div>
+
+  <div>
+    <ResidentsTable />    
   </div>
 </template>
 
 <script>
+import TopBar from './components/TopBar.vue';
 import ResidentsTable from './components/ResidentsTable.vue';
 
 export default {
   components: {
+    TopBar,
     ResidentsTable
   }
 };
@@ -25,6 +30,5 @@ export default {
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-  margin-top: 60px;
 }
 </style>
