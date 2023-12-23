@@ -24,11 +24,11 @@
         </thead>
 
         <tbody>
-          <tr v-for="row in paginatedRows" :key="row.num">
+          <tr v-for="row in paginatedRows" :key="row.id">
             
             <td v-if="isActionButtonsVisible">
               <!-- Checkbox for marking a row for deletion -->
-              <input type="checkbox" v-model="selectedRows" :value="row.num" />
+              <input type="checkbox" v-model="selectedRows" :value="row.id" />
             </td>
 
             <td v-for="(key, index) in filteredRowKeys(row)" :key="key">
@@ -279,6 +279,7 @@ export default {
   display: flex;
   justify-content: space-between;
   margin-bottom: 10px;
+  align-items: center;
 }
 
 .pagination-controls select {
