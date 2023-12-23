@@ -2,10 +2,16 @@
   <div class="TableView-container">
     <!-- Таблица и данные -->
     <!-- <div v-if="loaded"> -->
-
-        <!-- Таблица с данными -->
-        <!-- Использование компонента TableView для отображения данных жителей -->
-      <TableView :headers="headers" :rows="items" />
+        
+      <!-- Таблица с данными -->
+      <!-- Использование компонента TableView для отображения данных жителей -->
+      <TableView 
+        :tableTitle="tableTitle" 
+        :isActionButtonsVisible="isActionButtonsVisible" 
+        :headers="headers" 
+        :rows="items"
+        @delete-rows="handleDeleteRows"      
+      />
     
     <!-- </div>
     <div v-else class="loading">Загрузка...</div> -->
@@ -21,6 +27,8 @@ export default {
    },
    data() {
     return {
+        tableTitle: 'Список дачников',
+        isActionButtonsVisible: true,
         headers: ['#', 'ФИО', 'Площадь', 'Дата регистрации', /* ... другие заголовки ... */],
         items: [],
         loaded: false,
@@ -31,7 +39,9 @@ export default {
     this.fetchItems();
   },
   methods: {
-
+    handleDeleteRows(idsToDelete) {
+      this.rows = this.rows.filter(row => !idsToDelete.includes(row.id));
+    },
     fetchItems() {
         fetch('http://localhost:8000/api/residents')
             .then(response => this.validateResponse(response))
@@ -47,6 +57,7 @@ export default {
     },
     processItems(data) {
       this.items = data.map((item, index) => ({
+        id: item.id,
         num: index + 1,
         fio: item.fio,
         area: item.area,

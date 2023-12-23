@@ -2,27 +2,48 @@
   <div class="table-container">
 
     <!-- <div v-if="loaded"> -->
+      
+
+      <!-- Заголовок таблицы -->
+      <h1 v-if="tableTitle" class="table-title">{{ tableTitle }}</h1>
+      <!-- Действия над таблицей -->
+      <div v-if="isActionButtonsVisible" class="table-actions">
+        <button class="create-button" @click="createRow">+Создать</button>
+        <button class="delete-button" @click="deleteSelectedRows">-Удалить</button>
+      </div>
       <!-- Таблица с данными -->
       <table class="rounded-table">
+
         <thead>
           <tr>
-            <th v-for="header in headers" :key="header">{{ header }}</th>
+            <th v-if="isActionButtonsVisible">Выбрать</th><!-- New column for checkboxes -->
+            <th v-for="header in filteredHeaders" :key="header">{{ header }}</th>
           </tr>
         </thead>
+
         <tbody>
           <tr v-for="row in paginatedRows" :key="row.num">
-            <td v-for="(value, key) in row" :key="key">
-              <input v-if="isEditable(row.num, key)" type="text" v-model="edits[row.num][key]" />
-              <span v-else @dblclick="enableEdit(row.num, key)" :class="{disabled: currentlyEditingRowNum !== null && currentlyEditingRowNum !== row.num}">
-                {{ value }}
+            
+            <td v-if="isActionButtonsVisible">
+              <!-- Checkbox for marking a row for deletion -->
+              <input type="checkbox" v-model="selectedRows" :value="row.num" />
+            </td>
+
+            <td v-for="(key, index) in filteredRowKeys(row)" :key="key">
+              <!-- Only allow editing if it's not the first column -->
+              <input v-if="index !== 0 && isEditable(row.num, key)" type="text" v-model="edits[row.num][key]" />
+              <span v-else @dblclick="index !== 0 ? enableEdit(row.num, key) : null" :class="{disabled: currentlyEditingRowNum !== null && currentlyEditingRowNum !== row.num}">
+                {{ row[key] }}
               </span>
             </td>
+            
             <td>
               <button v-if="isRowBeingEdited(row.num)" @click="saveEdits(row.num)">Сохранить</button>
               <button v-if="isRowBeingEdited(row.num)" @click="cancelEdit(row.num)">Отменить</button>
             </td>
           </tr>
         </tbody>
+
       </table>
 
       <!-- Элементы управления пагинацией -->
@@ -47,12 +68,22 @@
 <script>
 export default {
   props: {
+    tableTitle: {
+      type: String,
+      default: ''
+    },
+
+    isActionButtonsVisible: {
+      type: Boolean,
+      default: false
+    },
     headers: Array,
     rows: {
       type: Array,
       default: () => [] // Теперь rows по умолчанию - пустой массив
     },
   },
+  
   data() {
     return {
       currentPage: 1,
@@ -61,10 +92,16 @@ export default {
 
       edits: {}, // Словарь для отслеживания изменений
       currentlyEditingRowNum: null,
+      selectedRows: [],
     };
   },
   
   computed: {
+
+    filteredHeaders() {
+      return this.headers.filter(header => header !== 'id');
+    },
+
     totalPages() {
       return Math.ceil(this.rows.length / this.rowsPerPage);
     },
@@ -80,13 +117,56 @@ export default {
   },
 
   methods: {
+    createRow() {
+      // Логика для создания новой строки
+    },
+    async deleteSelectedRows() {
+      if (this.selectedRows.length === 0) {
+        alert('не выбрано ни одной строки для удаления.'); // Or handle this case as you prefer
+        return;
+      }
+
+      // Подтверждение удаления
+      if (!window.confirm('Вы уверены, что хотите удалить выбранные строки?')) {
+        return;
+      }
+  
+      try {
+        // Replace 'your-delete-endpoint' with the actual endpoint URL
+        // Replace `id` with the actual property that identifies your row if needed
+        const response = await fetch('your-delete-endpoint', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ ids: this.selectedRows })
+        });
+  
+        const data = await response.json();
+  
+        // Assuming the backend returns a success response
+        if (data.success) {
+          // Remove the deleted rows from the local state
+          this.$emit('delete-rows', this.selectedRows);
+          this.selectedRows = []; // Clear selection after deletion
+        } else {
+          console.error('Failed to delete selected rows:', data.message);
+        }
+      } catch (error) {
+        console.error('Error sending delete request:', error);
+      }
+    },
+
+    filteredRowKeys(row) {
+      return Object.keys(row).filter(key => key !== 'id');
+    },
 
     isEditable(rowId, key) {
       return this.edits[rowId] != null && 
       Object.prototype.hasOwnProperty.call(this.edits[rowId], key);
     },
     isRowBeingEdited(rowId) {
-      console.log("isRowBeingEdited", rowId, this.currentlyEditingRowNum);
+      // console.log("isRowBeingEdited", rowId, this.currentlyEditingRowNum);
       return this.currentlyEditingRowNum === rowId;
     },
     enableEdit(rowId, key) {
@@ -128,6 +208,8 @@ export default {
       console.log('Отправка изменений на сервер:', rowId, updatedRow);
     },
 
+    
+
     nextPage() {
       if (this.currentPage < this.totalPages) {
         this.currentPage++;
@@ -143,6 +225,24 @@ export default {
 </script>
 
 <style>
+/* Кнопки создания и удаления */
+.create-button {
+  background-color: #4CAF50; /* Зеленый */
+  color: white;
+  margin: 10px;
+}
+
+.delete-button {
+  background-color: #F44336; /* Красный */
+  color: white;
+  /* Дополнительные стили для кнопки */
+}
+
+/*  */
+.table-title {
+  margin-bottom: 10px;
+}
+
 /* Стили для компонента Pagination-controls */
 .pagination-controls {
   display: flex;
