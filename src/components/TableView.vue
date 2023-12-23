@@ -6,11 +6,13 @@
 
       <!-- Заголовок таблицы -->
       <h1 v-if="tableTitle" class="table-title">{{ tableTitle }}</h1>
+
       <!-- Действия над таблицей -->
       <div v-if="isActionButtonsVisible" class="table-actions">
         <button class="create-button" @click="createRow">+Создать</button>
         <button class="delete-button" @click="deleteSelectedRows">-Удалить</button>
       </div>
+
       <!-- Таблица с данными -->
       <table class="rounded-table">
 
@@ -117,12 +119,13 @@ export default {
   },
 
   methods: {
+    /** Методы для создания и удаления строк */
     createRow() {
       // Логика для создания новой строки
     },
     async deleteSelectedRows() {
       if (this.selectedRows.length === 0) {
-        alert('не выбрано ни одной строки для удаления.'); // Or handle this case as you prefer
+        alert('не выбрано ни одной строки для удаления.'); 
         return;
       }
 
@@ -183,6 +186,8 @@ export default {
       }
       // console.log("enableEdit", rowId, key);
     },
+
+    /** Методы для кнопок редактирования строк */ 
     cancelEdit(rowId) {
       if (this.edits[rowId]) {
         delete this.edits[rowId];
@@ -206,10 +211,33 @@ export default {
     async updateRow(rowId, updatedRow) {
       // Здесь должен быть код для отправки изменений на сервер
       console.log('Отправка изменений на сервер:', rowId, updatedRow);
+      try {
+        const response = await fetch(
+          `http://localhost:8000/api/residents/${rowId}`,
+          {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(updatedRow),
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+
+        const data = await response.json();
+        console.log('Resident updated successfully:', data);
+        // Handle the success scenario, e.g., update the UI or state accordingly
+      } catch (error) {
+        console.error('Error updating resident:', error);
+        // Handle the error scenario
+      }
     },
 
     
-
+    /** Кнопки навигации */
     nextPage() {
       if (this.currentPage < this.totalPages) {
         this.currentPage++;
@@ -220,6 +248,7 @@ export default {
         this.currentPage--;
       }
     }
+
   }
 };
 </script>
@@ -238,10 +267,12 @@ export default {
   /* Дополнительные стили для кнопки */
 }
 
+
 /*  */
 .table-title {
   margin-bottom: 10px;
 }
+
 
 /* Стили для компонента Pagination-controls */
 .pagination-controls {
@@ -257,6 +288,7 @@ export default {
 .pagination-controls button {
   padding: 5px 10px;
 }
+
 
 /* Стили для компонента Table */
 table {
@@ -303,11 +335,13 @@ th {
   border-top: 1px solid #ddd; /* Границы для заголовка таблицы */
 }
 
+
 /* Стили для компонента Disabled */
 .disabled {
   color: #a1a1a1; /* светло-серый цвет текста */
   cursor: not-allowed; /* курсор в виде знака запрета */
   opacity: 0.6; /* полупрозрачность */
 }
+
 
 </style>

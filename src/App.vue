@@ -5,18 +5,26 @@
     <TopBar />
   </div>
 
-  <div>
+  <span>
+    <BillTable />
+  </span>
+
+  <span>
     <ResidentsTable />    
-  </div>
+  </span>
+
+
 </template>
 
 <script>
 import TopBar from './components/TopBar.vue';
-import ResidentsTable from './components/ResidentsTable.vue';
+import BillTable from './components/BillTable.vue';
+import ResidentsTable from './components/ResidentTable.vue';
 
 export default {
   components: {
     TopBar,
+    BillTable,
     ResidentsTable
   }
 };
