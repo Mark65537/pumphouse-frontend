@@ -71,7 +71,6 @@ export default {
  .TableView-container {
   display: flex;
   justify-content: flex-start; /* Выравнивание в правой части контейнера */
-  margin: 20px 0;
 } 
 
 .loading {
