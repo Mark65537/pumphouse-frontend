@@ -3,7 +3,7 @@
     <div class="readings-input-container">
       <label for="readings">Показания: </label>
       <input type="text" v-model="readings" placeholder="Введите показания">
-      <span>за {{ currentMonthAndYear }}</span>
+      <span>за {{ prevMonthAndYear }}</span>
     </div>
     <button @click="submitReadings">Передать показания</button>
   </div>
@@ -18,8 +18,9 @@ export default {
   },
 
   computed: {
-    currentMonthAndYear() {
+    prevMonthAndYear() {
       const now = new Date();
+      now.setMonth(now.getMonth() - 1);
       const month = now.toLocaleString('default', { month: 'long' });
       const year = now.getFullYear();
       return `${month} ${year}`;
@@ -29,7 +30,10 @@ export default {
   methods: {
     submitReadings() {
       // You could use this method to send the readings to a server or process them
-      console.log('Submitted readings:', this.readings);
+      if(this.readings.length == 0) {
+        alert('Показания не введены');
+        return;
+      }
       
       // After submitting, you might want to clear the field
       this.readings = '';

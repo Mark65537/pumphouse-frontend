@@ -33,15 +33,15 @@
 
             <td v-for="(key, index) in filteredRowKeys(row)" :key="key">
               <!-- Only allow editing if it's not the first column -->
-              <input v-if="index !== 0 && isEditable(row.num, key)" type="text" v-model="edits[row.num][key]" />
-              <span v-else @dblclick="index !== 0 ? enableEdit(row.num, key) : null" :class="{disabled: currentlyEditingRowNum !== null && currentlyEditingRowNum !== row.num}">
+              <input v-if="index !== 0 && isEditable(row.id, key)" type="text" v-model="edits[row.id][key]" />
+              <span v-else @dblclick="index !== 0 ? enableEdit(row.id, key) : null" :class="{disabled: currentlyEditingRowNum !== null && currentlyEditingRowNum !== row.id}">
                 {{ row[key] }}
               </span>
             </td>
             
             <td>
-              <button v-if="isRowBeingEdited(row.num)" @click="saveEdits(row.num)">Сохранить</button>
-              <button v-if="isRowBeingEdited(row.num)" @click="cancelEdit(row.num)">Отменить</button>
+              <button v-if="isRowBeingEdited(row.id)" @click="saveEdits(row.id)">Сохранить</button>
+              <button v-if="isRowBeingEdited(row.id)" @click="cancelEdit(row.id)">Отменить</button>
             </td>
           </tr>
         </tbody>
@@ -121,7 +121,34 @@ export default {
   methods: {
     /** Методы для создания и удаления строк */
     createRow() {
-      // Логика для создания новой строки
+      const newRow = { /* ключи и пустые значения для новой строки */ };
+      this.paginatedRows.unshift(newRow);
+      this.isNewRow = true;
+    },
+    saveNewRow() {
+      // Здесь отправка данных на бэкенд
+      // const newRowData = this.paginatedRows[0];
+      // fetch(apiURL, {
+      //   method: 'POST',
+      //   body: formData,
+      // })
+      // .then(response => {
+      //   if (!response.ok) {
+      //     throw new Error('Network response was not ok');
+      //   }
+      //   return response.json();
+      // })
+      // .then(data => {
+      //   // Обработайте данные, возвращенные бэкендом, если это необходимо
+      //   // Например, добавьте новую строку в таблицу
+      //   this.paginatedRows.push(this.newRowData);
+      //   // Сбросить состояние новой строки
+      //   this.isNewRow = false;
+      //   this.newRowData = { name: '', age: '' }; // сбросить поля
+      // })
+      // .catch(error => {
+      //   console.error('There has been a problem with your fetch operation:', error);
+      // });
     },
     async deleteSelectedRows() {
       if (this.selectedRows.length === 0) {
@@ -137,27 +164,33 @@ export default {
       try {
         // Replace 'your-delete-endpoint' with the actual endpoint URL
         // Replace `id` with the actual property that identifies your row if needed
-        const response = await fetch('your-delete-endpoint', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ ids: this.selectedRows })
-        });
+        const deletePromises = this.selectedRows.map(async (rowId) => 
+          {
+            const response = await fetch(
+              `http://localhost:8000/api/residents/${rowId}`, 
+              {
+                method: 'DELETE',
+                headers: {
+                  'Content-Type': 'application/json',
+                },          
+              }
+            );
+
+            const data = await response.json();
+
+            if (!data.success) {
+              throw new Error(data.message);
+            }
+          }
+        );
   
-        const data = await response.json();
+        await Promise.all(deletePromises);
   
-        // Assuming the backend returns a success response
-        if (data.success) {
-          // Remove the deleted rows from the local state
-          this.$emit('delete-rows', this.selectedRows);
-          this.selectedRows = []; // Clear selection after deletion
-        } else {
-          console.error('Failed to delete selected rows:', data.message);
+        this.$emit('delete-rows', this.selectedRows);
+        this.selectedRows = [];
+        } catch (error) {
+          console.error('Error sending delete request:', error);
         }
-      } catch (error) {
-        console.error('Error sending delete request:', error);
-      }
     },
 
     filteredRowKeys(row) {
@@ -169,7 +202,6 @@ export default {
       Object.prototype.hasOwnProperty.call(this.edits[rowId], key);
     },
     isRowBeingEdited(rowId) {
-      // console.log("isRowBeingEdited", rowId, this.currentlyEditingRowNum);
       return this.currentlyEditingRowNum === rowId;
     },
     enableEdit(rowId, key) {
@@ -179,7 +211,7 @@ export default {
         if (!this.edits[rowId]) {
           this.edits[rowId] = {};
         }
-        this.edits[rowId][key] = this.rows.find(row => row.num === rowId)[key];
+        this.edits[rowId][key] = this.rows.find(row => row.id === rowId)[key];
 
         this.currentlyEditingRowNum = rowId;
 
@@ -198,7 +230,7 @@ export default {
       const updatedRow = this.edits[rowId];
       try {
         await this.updateRow(rowId, updatedRow); // Метод для отправки изменений на сервер
-        Object.assign(this.rows.find(row => row.num === rowId), updatedRow);
+        Object.assign(this.rows.find(row => row.id === rowId), updatedRow);
         if (this.edits[rowId]) {
           delete this.edits[rowId];
         }

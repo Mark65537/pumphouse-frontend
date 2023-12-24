@@ -7,7 +7,7 @@
     
     <div class="input-group">
       <label for="month-year">За дату:</label>
-      <input type="month" id="month-year" v-model="effectiveDate" :min="effectiveDate">
+      <input type="month" id="month-year" v-model="effectiveDate" :min="minDate">
     </div>
 
     <button @click="updateTariff">Обновить тариф</button>
@@ -28,12 +28,46 @@ export default {
     return {
       tariff: 0,
       effectiveDate: getCurrentMonthAndYear(),
+      minDate: getCurrentMonthAndYear()
     };
   },
   methods: {
-    updateTariff() {
-      console.log('Тариф обновлен:', this.tariff, ' за дату:', this.effectiveDate);
-      // Implement the logic to handle tariff update
+    async updateTariff() {
+      try {
+        // Post effectiveDate to the API
+        const dateResponse = await fetch(
+          'http://localhost:8000/api/periods', 
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ date: this.effectiveDate }),
+          }
+        );
+
+        await dateResponse.json();
+
+        // Check if date post was successful before posting tariff
+        if (dateResponse.ok) {
+          // Post tariff to the API
+          const tariffResponse = await fetch(
+            'http://localhost:8000/api/tariff',
+            {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ tariff: this.tariff }),
+            }
+          );
+          
+          await tariffResponse.json();
+
+          console.log(`Тариф обновлен: ${this.tariff} за дату: `,
+                      `${this.effectiveDate}`);
+        } else {
+          console.error('Ошибка при обновлении даты');
+        }    
+      } catch (error) {
+        console.error('Ошибка при обновлении тарифа:', error);
+      }
     }
   }
 }

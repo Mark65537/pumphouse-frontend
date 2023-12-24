@@ -25,6 +25,10 @@
     <ResidentsTable />    
   </span>
 
+  <span>
+    <TarifTable />    
+  </span>
+
 
 </template>
 
@@ -35,6 +39,7 @@ import EnterReadings from './components/EnterReadings.vue';
 import EnterTarif from './components/EnterTarif.vue';
 import BillTable from './components/BillTable.vue';
 import ResidentsTable from './components/ResidentTable.vue';
+import TarifTable from './components/TarifTable.vue';
 
 export default {
   components: {
@@ -44,6 +49,7 @@ export default {
     EnterTarif,
     BillTable,
     ResidentsTable,
+    TarifTable,
   }
 };
 </script>
