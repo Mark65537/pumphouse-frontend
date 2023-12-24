@@ -33,34 +33,45 @@ export default {
   },
   methods: {
     async updateTariff() {
+      const apiUrl = 'http://localhost:8000/api';
+      const headers = { 'Content-Type': 'application/json' };
+
       try {
+        console.log('Effective date: ',this.effectiveDate);
         // Post effectiveDate to the API
+        const datePayload = JSON.stringify({ 
+          date: this.effectiveDate 
+        });
+
         const dateResponse = await fetch(
-          'http://localhost:8000/api/periods', 
+          `${apiUrl}/periods`, 
           {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ date: this.effectiveDate }),
+            headers: headers,
+            body: datePayload,
           }
         );
 
-        await dateResponse.json();
+        const dateJson = await dateResponse.json();
+        const periodId = dateJson.id;
 
         // Check if date post was successful before posting tariff
         if (dateResponse.ok) {
-          // Post tariff to the API
-          const tariffResponse = await fetch(
-            'http://localhost:8000/api/tariff',
-            {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ tariff: this.tariff }),
-            }
-          );
-          
+          console.log('Tarif.period_id: ',periodId, 'tarif: ',this.tariff);
+          const tariffPayload = JSON.stringify({
+            period_id: periodId,
+            amount_rub: this.tariff
+          });
+
+          const tariffResponse = await fetch(`${apiUrl}/tarifs`, {
+            method: 'POST',
+            headers: headers,
+            body: tariffPayload,
+          });
+
           await tariffResponse.json();
 
-          console.log(`Тариф обновлен: ${this.tariff} за дату: `,
+          console.log(`Тариф обновлен: ${this.tariff} руб за дату: `,
                       `${this.effectiveDate}`);
         } else {
           console.error('Ошибка при обновлении даты');
