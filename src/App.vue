@@ -1,57 +1,31 @@
 <!-- App.vue -->
 <template>
 
-  <div>
-    <TopBar />
-  </div>
-
-  <div>
-    <CurrentDateArea />
-  </div>
-
-  <div>
-    <EnterReadings />
-  </div>
-
-  <div>
-    <EnterTarif />
-  </div>
-
-  <span>
-    <BillTable />
-  </span>
-
-  <span>
-    <ResidentsTable />    
-  </span>
-
-  <span>
-    <TarifTable />    
-  </span>
+  <RouterView/>
 
 
 </template>
 
 <script>
-import TopBar from './components/TopBar.vue';
-import CurrentDateArea from './components/CurrentDateArea.vue';
-import EnterReadings from './components/EnterReadings.vue';
-import EnterTarif from './components/EnterTarif.vue';
-import BillTable from './components/BillTable.vue';
-import ResidentsTable from './components/ResidentTable.vue';
-import TarifTable from './components/TarifTable.vue';
+// import TopBar from './components/TopBar.vue';
+// import CurrentDateArea from './components/CurrentDateArea.vue';
+// import EnterReadings from './components/EnterReadings.vue';
+// import EnterTarif from './components/EnterTarif.vue';
+// import BillTable from './components/BillTable.vue';
+// import ResidentsTable from './components/ResidentTable.vue';
+// import TarifTable from './components/TarifTable.vue';
 
-export default {
-  components: {
-    TopBar,
-    CurrentDateArea,
-    EnterReadings,
-    EnterTarif,
-    BillTable,
-    ResidentsTable,
-    TarifTable,
-  }
-};
+// export default {
+//   components: {
+//     TopBar,
+//     CurrentDateArea,
+//     EnterReadings,
+//     EnterTarif,
+//     BillTable,
+//     ResidentsTable,
+//     TarifTable,
+//   }
+// };
 </script>
 
 <style>
