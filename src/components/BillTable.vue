@@ -35,6 +35,15 @@ export default {
   created() {
     this.fetchItems();
   },
+  computed: {
+    prevMonthAndYear() {
+      const now = new Date();
+      now.setMonth(now.getMonth() - 1);
+      const month = now.toLocaleString('default', { month: 'long' });
+      const year = now.getFullYear();
+      return `${month} ${year}`;
+    }
+  },
   methods: {
     fetchItems() {
         fetch('http://localhost:8000/api/bills')

@@ -38,7 +38,7 @@ export default {
 
       try {
         console.log('Effective date: ',this.effectiveDate);
-        // Post effectiveDate to the API
+
         const datePayload = JSON.stringify({ 
           date: this.effectiveDate 
         });
@@ -71,7 +71,7 @@ export default {
 
           await tariffResponse.json();
 
-          console.log(`Тариф обновлен: ${this.tariff} руб за дату: `,
+          alert(`Тариф обновлен: ${this.tariff} руб за дату: `,
                       `${this.effectiveDate}`);
         } else {
           console.error('Ошибка при обновлении даты');

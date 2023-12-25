@@ -2,7 +2,7 @@
   <div class="readings-component">
     <div class="readings-input-container">
       <label for="readings">Показания: </label>
-      <input type="text" v-model="readings" placeholder="Введите показания">
+      <input type="number" v-model="readings" :min="0" placeholder="Введите показания">
       <span>за {{ prevMonthAndYear }}</span>
     </div>
     <button @click="submitReadings">Передать показания</button>
@@ -13,7 +13,8 @@
 export default {
   data() {
     return {
-      readings: ''
+      defaultReadings: 1,
+      readings: 1
     };
   },
 
@@ -28,15 +29,41 @@ export default {
   },
   
   methods: {
-    submitReadings() {
-      // You could use this method to send the readings to a server or process them
-      if(this.readings.length == 0) {
+    async submitReadings() {
+      if (this.readings.length === 0) {
         alert('Показания не введены');
         return;
       }
-      
-      // After submitting, you might want to clear the field
-      this.readings = '';
+      try {
+        const response = await this.postReadings();
+        await this.handleResponse(response);
+      } catch (error) {
+        console.error(error);
+      }
+      this.resetReadings();
+    },  
+    async postReadings() {
+      return fetch(
+        'http://localhost:8000/api/bills', 
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ amount_volume: this.readings })
+        }
+      );
+    },
+    async handleResponse(response) {
+      if (response.ok) {
+        alert('Показания переданы');
+      } else if (response.status === 404) {
+        const data = await response.json();
+        alert(data.message);
+      } else {
+        throw new Error('Ошибка при выполнении запроса');
+      }
+    },
+    resetReadings() {
+      this.readings = this.defaultReadings;
     }
   }
 }
