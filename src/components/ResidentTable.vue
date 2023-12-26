@@ -7,7 +7,7 @@
       <!-- Использование компонента TableView для отображения данных дачников -->
       <TableView 
         :tableTitle="tableTitle" 
-        :isActionButtonsVisible="isActionButtonsVisible" 
+        :isEditable="isEditable" 
         :headers="headers" 
         :rows="items"
         @delete-rows="handleDeleteRows"      
@@ -28,7 +28,7 @@ export default {
    data() {
     return {
         tableTitle: 'Список дачников',
-        isActionButtonsVisible: true,
+        isEditable: true,
         headers: ['#', 'ФИО', 'Площадь', 'Дата регистрации', /* ... другие заголовки ... */],
         items: [],
         loaded: false,

@@ -4,11 +4,11 @@
     <!-- <div v-if="loaded"> -->
       
 
-      <!-- Заголовок таблицы -->
+      <!-- Титульник таблицы -->
       <h1 v-if="tableTitle" class="table-title">{{ tableTitle }}</h1>
 
-      <!-- Действия над таблицей -->
-      <div v-if="isActionButtonsVisible" class="table-actions">
+      <!-- Кнопки создать и удалить -->
+      <div v-if="isEditable" class="table-actions">
         <button class="create-button" @click="createRow">+Создать</button>
         <button class="delete-button" @click="deleteSelectedRows">-Удалить</button>
       </div>
@@ -16,9 +16,10 @@
       <!-- Таблица с данными -->
       <table class="rounded-table">
 
+        <!-- Заголовки таблицы -->
         <thead>
           <tr>
-            <th v-if="isActionButtonsVisible">Выбрать</th><!-- New column for checkboxes -->
+            <th v-if="isEditable">Выбрать</th>
             <th v-for="header in filteredHeaders" :key="header">{{ header }}</th>
           </tr>
         </thead>
@@ -26,23 +27,41 @@
         <tbody>
           <tr v-for="row in paginatedRows" :key="row.id">
             
-            <td v-if="isActionButtonsVisible">
-              <!-- Checkbox for marking a row for deletion -->
+            <td v-if="isEditable">
+              <!-- Checkbox для выбора строк для удаления -->
               <input type="checkbox" v-model="selectedRows" :value="row.id" />
             </td>
 
             <td v-for="(key, index) in filteredRowKeys(row)" :key="key">
-              <!-- Only allow editing if it's not the first column -->
-              <input v-if="index !== 0 && isEditable(row.id, key)" type="text" v-model="edits[row.id][key]" />
-              <span v-else @dblclick="index !== 0 ? enableEdit(row.id, key) : null" :class="{disabled: currentlyEditingRowNum !== null && currentlyEditingRowNum !== row.id}">
-                {{ row[key] }}
-              </span>
+              <!-- Разрешить редактирование, только если это не первый столбец -->
+              <div v-if="isEditable">
+                <input 
+                  v-if="index !== 0 && isEditingCell(row.id, key)"  
+                  type="text" 
+                  v-model="editingRow[row.id][key]" 
+                />
+                <span 
+                  v-else @dblclick="index !== 0
+                                    ? activateСellEdit(row.id, key) : null" 
+                  :class="{
+                      disabled: currentlyEditingRowNum !== null && 
+                      currentlyEditingRowNum !== row.id
+                    }"
+                >
+                    
+                  {{ row[key] }}
+                </span>
+              </div>
+              <span v-else> {{ row[key] }} </span>
+
             </td>
             
+            <!-- Кнопки для редактирования -->
             <td>
               <button v-if="isRowBeingEdited(row.id)" @click="saveEdits(row.id)">Сохранить</button>
               <button v-if="isRowBeingEdited(row.id)" @click="cancelEdit(row.id)">Отменить</button>
             </td>
+
           </tr>
         </tbody>
 
@@ -75,14 +94,18 @@ export default {
       default: ''
     },
 
-    isActionButtonsVisible: {
-      type: Boolean,
-      default: false
-    },
     headers: Array,
     rows: {
       type: Array,
       default: () => [] // Теперь rows по умолчанию - пустой массив
+    },
+    isActionButtonsVisible: {
+      type: Boolean,
+      default: false
+    },
+    isEditable: {
+      type: Boolean,
+      default: false
     },
   },
   
@@ -92,8 +115,9 @@ export default {
       rowsPerPage: 5,
       rowsPerPageOptions: [5, 10, 50, 100],
 
-      edits: {}, // Словарь для отслеживания изменений
+      editingRow: {}, // Словарь для отслеживания изменений
       currentlyEditingRowNum: null,
+      currentlyEditingRowKey: null,
       selectedRows: [],
     };
   },
@@ -121,8 +145,15 @@ export default {
   methods: {
     /** Методы для создания и удаления строк */
     createRow() {
-      const newRow = { /* ключи и пустые значения для новой строки */ };
+      const newRow = { 
+        'id' : 1,
+        'num' : 1, 
+        'fio': "John Doe", 
+        'area': 123, 
+        'start_date': '2023-01-01', 
+      };
       this.paginatedRows.unshift(newRow);
+      this.enableEdit(newRow.id, Object.keys(newRow)[0]); // enable editing for the new row
       this.isNewRow = true;
     },
     saveNewRow() {
@@ -152,7 +183,7 @@ export default {
     },
     async deleteSelectedRows() {
       if (this.selectedRows.length === 0) {
-        alert('не выбрано ни одной строки для удаления.'); 
+        alert('Не выбрано ни одной строки для удаления.'); 
         return;
       }
 
@@ -162,8 +193,6 @@ export default {
       }
   
       try {
-        // Replace 'your-delete-endpoint' with the actual endpoint URL
-        // Replace `id` with the actual property that identifies your row if needed
         const deletePromises = this.selectedRows.map(async (rowId) => 
           {
             const response = await fetch(
@@ -197,42 +226,45 @@ export default {
       return Object.keys(row).filter(key => key !== 'id');
     },
 
-    isEditable(rowId, key) {
-      return this.edits[rowId] != null && 
-      Object.prototype.hasOwnProperty.call(this.edits[rowId], key);
+    isEditingCell(rowId, key) {
+      return this.editingRow[rowId] != null && 
+      Object.prototype.hasOwnProperty.call(this.editingRow[rowId], key);
     },
     isRowBeingEdited(rowId) {
       return this.currentlyEditingRowNum === rowId;
     },
-    enableEdit(rowId, key) {
-      if (this.currentlyEditingRowNum === null || 
-              this.currentlyEditingRowNum === rowId) { // Если ни одна строка не редактируется или редактируется эта строка
+    activateСellEdit(rowId, key) {
+      if ((this.currentlyEditingRowNum === null || 
+              this.currentlyEditingRowNum === rowId) &&
+          (this.currentlyEditingRowKey === null || 
+              this.currentlyEditingRowKey === key)) { // Если ни одна строка не редактируется или редактируется эта строка
         
-        if (!this.edits[rowId]) {
-          this.edits[rowId] = {};
+        if (!this.editingRow[rowId]) {
+          this.editingRow[rowId] = {};
         }
-        this.edits[rowId][key] = this.rows.find(row => row.id === rowId)[key];
+        this.editingRow[rowId][key] = this.rows.find(row => row.id === rowId)[key];
 
         this.currentlyEditingRowNum = rowId;
+        this.currentlyEditingRowKey = key;
 
       }
-      // console.log("enableEdit", rowId, key);
+      console.log("enableEdit", rowId, key);
     },
 
     /** Методы для кнопок редактирования строк */ 
     cancelEdit(rowId) {
-      if (this.edits[rowId]) {
-        delete this.edits[rowId];
+      if (this.editingRow[rowId]) {
+        delete this.editingRow[rowId];
       }
       this.currentlyEditingRowNum = null; // Сброс текущей редактируемой строки
     },
     async saveEdits(rowId) {
-      const updatedRow = this.edits[rowId];
+      const updatedRow = this.editingRow[rowId];
       try {
         await this.updateRow(rowId, updatedRow); // Метод для отправки изменений на сервер
         Object.assign(this.rows.find(row => row.id === rowId), updatedRow);
-        if (this.edits[rowId]) {
-          delete this.edits[rowId];
+        if (this.editingRow[rowId]) {
+          delete this.editingRow[rowId];
         }
       } catch (error) {
         console.error('Ошибка при сохранении:', error);
@@ -261,10 +293,9 @@ export default {
 
         const data = await response.json();
         console.log('Resident updated successfully:', data);
-        // Handle the success scenario, e.g., update the UI or state accordingly
+
       } catch (error) {
         console.error('Error updating resident:', error);
-        // Handle the error scenario
       }
     },
 
