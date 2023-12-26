@@ -37,6 +37,12 @@ export default {
         alert('Показания не введены');
         return;
       }
+
+      // Подтверждение удаления
+      if (!window.confirm('При передачи показаний вы не сможете их изменить. Вы уверены, что хотите передать показания?')) {
+        return;
+      }
+
       try {
         const response = await this.postReadings();
         await this.handleResponse(response);
