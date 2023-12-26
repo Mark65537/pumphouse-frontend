@@ -11,22 +11,25 @@
 
 <script>
 export default {
+  props: {
+    prevMonthAndYear: String,
+  },
   data() {
     return {
       defaultReadings: 1,
-      readings: 1
+      readings: 1,
     };
   },
 
-  computed: {
-    prevMonthAndYear() {
-      const now = new Date();
-      now.setMonth(now.getMonth() - 1);
-      const month = now.toLocaleString('default', { month: 'long' });
-      const year = now.getFullYear();
-      return `${month} ${year}`;
-    }
-  },
+  // computed: {
+  //   prevMonthAndYear() {
+  //     const now = new Date();
+  //     now.setMonth(now.getMonth() - 1);
+  //     const month = now.toLocaleString('default', { month: 'long' });
+  //     const year = now.getFullYear();
+  //     return `${month} ${year}`;
+  //   }
+  // },
   
   methods: {
     async submitReadings() {

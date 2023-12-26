@@ -13,7 +13,7 @@
   </div>
 
   <div>
-    <EnterReadings />
+    <EnterReadings :prevMonthAndYear="prevMonthAndYear"/>
   </div>
 
 
@@ -56,11 +56,15 @@ export default {
     const year = currentDate.getFullYear();
     const month = String(currentDate.getMonth() + 1).padStart(2, '0');
     const day = String(currentDate.getDate()).padStart(2, '0');
-    const formattedDate = `${year}-${month}-${day}`;
+
+    currentDate.setMonth(currentDate.getMonth() - 1);
+    const prevMonth = currentDate.toLocaleString('default', { month: 'long' });
+
 
     return {
       effectiveDate: `${year}-${month}`,
-      currentDate: formattedDate,
+      currentDate: `${year}-${month}-${day}`,
+      prevMonthAndYear: `${prevMonth} ${year}`,
     };
   },
   methods: {    
@@ -68,7 +72,11 @@ export default {
       const date = new Date(newDate);
       const year = date.getFullYear();
       const month = String(date.getMonth() + 1).padStart(2, '0');
+      date.setMonth(date.getMonth() - 1);
+      const prevMonth = date.toLocaleString('default', { month: 'long' });
+
       this.effectiveDate = `${year}-${month}`;
+      this.prevMonthAndYear = `${prevMonth} ${year}`;
     }
   }
 };

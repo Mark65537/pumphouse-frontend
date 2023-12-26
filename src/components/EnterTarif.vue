@@ -24,87 +24,66 @@ export default {
     effectiveDate : String,
   },
   data() {
-    // Helper function to format the current date as YYYY-MM
-    function getCurrentMonthAndYear() {
-      const now = new Date();
-      const year = now.getFullYear();
-      const month = (now.getMonth() + 1).toString().padStart(2, '0');
-      return `${year}-${month}`;
-    }
 
     return {
       tariff: 0,
-      // effectiveDate: '2023-01',
-      // effectiveDate: getCurrentMonthAndYear(),
-      minDate: getCurrentMonthAndYear()
+      minDate: this.formatYearMonth(new Date())
     };
   },
-  // computed: {
-    // Use a computed setter and getter to handle prop updates
-    // localEffectiveDate: {
-    //   get() {
-    //     return this.effectiveDate;
-    //   },
-    //   set(newValue) {
-    //     this.$emit('update:effectiveDate', newValue);
-    //   }
-    // }
-  // },
   methods: {
-    // updateEffectiveDate(newValue) {
-    //   this.$emit('update-effectiveDate', newValue);
-    // },
-    // updateEffectiveDate(event) {
-    //   this.$emit('update-effectiveDate', event.target.value);
-    // },
-    // async updateTariff() {
-    //   const apiUrl = 'http://localhost:8000/api';
-    //   const headers = { 'Content-Type': 'application/json' };
+    formatYearMonth(date) {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      return `${year}-${month}`;
+    },
+    async updateTariff() {
+      const apiUrl = 'http://localhost:8000/api';
+      const headers = { 'Content-Type': 'application/json' };
 
-    //   try {
-    //     console.log('Effective date: ',this.effectiveDate);
+      try {
+        console.log('Effective date: ',this.effectiveDate);
 
-    //     const datePayload = JSON.stringify({ 
-    //       date: this.effectiveDate 
-    //     });
+        const datePayload = JSON.stringify({ 
+          date: this.effectiveDate 
+        });
 
-    //     const dateResponse = await fetch(
-    //       `${apiUrl}/periods`, 
-    //       {
-    //         method: 'POST',
-    //         headers: headers,
-    //         body: datePayload,
-    //       }
-    //     );
+        const dateResponse = await fetch(
+          `${apiUrl}/periods`, 
+          {
+            method: 'POST',
+            headers: headers,
+            body: datePayload,
+          }
+        );
 
-    //     const dateJson = await dateResponse.json();
-    //     const periodId = dateJson.id;
+        const dateJson = await dateResponse.json();
+        const periodId = dateJson.id;
 
-    //     // Check if date post was successful before posting tariff
-    //     if (dateResponse.ok) {
-    //       console.log('Tarif.period_id: ',periodId, 'tarif: ',this.tariff);
-    //       const tariffPayload = JSON.stringify({
-    //         period_id: periodId,
-    //         amount_rub: this.tariff
-    //       });
+        // Check if date post was successful before posting tariff
+        if (dateResponse.ok) {
+          console.log('Tarif.period_id: ',periodId, 'tarif: ',this.tariff);
+          const tariffPayload = JSON.stringify({
+            period_id: periodId,
+            amount_rub: this.tariff
+          });
 
-    //       const tariffResponse = await fetch(`${apiUrl}/tarifs`, {
-    //         method: 'POST',
-    //         headers: headers,
-    //         body: tariffPayload,
-    //       });
+          const tariffResponse = await fetch(`${apiUrl}/tarifs`, {
+            method: 'POST',
+            headers: headers,
+            body: tariffPayload,
+          });
 
-    //       await tariffResponse.json();
+          await tariffResponse.json();
 
-    //       alert(`Тариф обновлен: ${this.tariff} руб за дату: `,
-    //                   `${this.effectiveDate}`);
-    //     } else {
-    //       console.error('Ошибка при обновлении даты');
-    //     }    
-    //   } catch (error) {
-    //     console.error('Ошибка при обновлении тарифа:', error);
-    //   }
-    // }
+          alert(`Тариф обновлен: ${this.tariff} руб за дату: `,
+                      `${this.effectiveDate}`);
+        } else {
+          console.error('Ошибка при обновлении даты');
+        }    
+      } catch (error) {
+        console.error('Ошибка при обновлении тарифа:', error);
+      }
+    }
   }
 }
 </script>
