@@ -34,7 +34,7 @@ export default {
       this.redirectToHome();
       this.$emit('login-success');
     },
-    async authenticateUser() {
+    authenticateUser() {
       const apiUrl = 'http://localhost:8000/api/login';
       const options = {
         method: 'POST',
@@ -43,11 +43,12 @@ export default {
       };
 
       try {
-        const response = await fetch(apiUrl, options);
-        const data = await response.json();
+        const response = fetch(apiUrl, options);
+        const data = response.json();
 
         console.log('Authentication successful', data);
         localStorage.setItem('auth-token', data.token);
+        localStorage.setItem('user-name', data.user);
       } catch (error) {
         console.error('Authentication error', error);
       }

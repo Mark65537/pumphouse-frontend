@@ -4,6 +4,8 @@
     <TopBar />
   </div>
 
+  <!-- <div> {{ localStorage.getItem('user-name') }} </div> -->
+
   <div>
     <CurrentDateArea @date-changed="handleDateChange" :initialDate="currentDate"/>
   </div>
