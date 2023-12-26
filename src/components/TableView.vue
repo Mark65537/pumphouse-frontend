@@ -57,7 +57,7 @@
             </td>
             
             <!-- Кнопки для редактирования -->
-            <td>
+            <td v-if="currentlyEditingRowNum">
               <button v-if="isRowBeingEdited(row.id)" @click="saveEdits(row.id)">Сохранить</button>
               <button v-if="isRowBeingEdited(row.id)" @click="cancelEdit(row.id)">Отменить</button>
             </td>
@@ -256,7 +256,8 @@ export default {
       if (this.editingRow[rowId]) {
         delete this.editingRow[rowId];
       }
-      this.currentlyEditingRowNum = null; // Сброс текущей редактируемой строки
+      this.currentlyEditingRowNum = null;
+      this.currentlyEditingRowKey = null;
     },
     async saveEdits(rowId) {
       const updatedRow = this.editingRow[rowId];
@@ -268,7 +269,6 @@ export default {
         }
       } catch (error) {
         console.error('Ошибка при сохранении:', error);
-        // Обработка ошибок, возможно показ уведомления
       }
       this.currentlyEditingRowNum = null;
     },
