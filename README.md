@@ -1,24 +1,39 @@
-# pumphouse-frontend
+<h1 align="center"><img src="https://vuejs.org/logo.svg" height="32"/> Водокачка+ <img src="https://vuejs.org/logo.svg" height="32"/></h1>
+<h2 align="center">Vue + Laravel</h2>
+<h3 align="center">Приложение представляет собой небольшую АИС, в который вы как хозяин водокачки можете заносить и изменять показания счётчика, изменять цену воды за кубометр и добавлять новых пользователей к вашему огороду</h3>
+<h3 align="center">Приложение же в свою очередь фильтрует и отображает(в зависимости от выбранного месяца) в таблице занесённых вами пользователей, а так же производит расчёты сколько каждый дачник должен вам заплатить.</h3>
 
-## Project setup
+## Инструкция для запуска
+
+Клонируйте репозиторий c API себе:
+
+```sh
+git clone https://github.com/Mark65537/pumphouse-backend
 ```
+
+## Для Fronted разработки
+
+<p>Первым делом установите <a href="https://nodejs.org/en">Node.js</a></p>
+Далее, клонируйте репозиторий себе:
+
+```sh
+git clone https://github.com/Mark65537/pumphouse-frontend.git
+```
+
+И последовательно выполните следующие команды:
+
+```sh
 npm install
 ```
 
-### Compiles and hot-reloads for development
-```
-npm run serve
+```sh
+npm run dev
 ```
 
-### Compiles and minifies for production
-```
+## Билд проекта
+
+```sh
 npm run build
 ```
 
-### Lints and fixes files
-```
-npm run lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+## Использование

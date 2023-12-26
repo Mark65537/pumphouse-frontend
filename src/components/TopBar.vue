@@ -5,7 +5,6 @@
     </div>
     <button v-if="!user.logged" @click="login">Вход</button>
     <button v-else @click="logout">Выход</button>
-
   </div>
 </template>
 
@@ -13,21 +12,30 @@
 import { useRouter } from 'vue-router';
 
 export default {
+
+
   props: {
     user: {
       type: Object,
       default: () => ({ name: "Админ", logged: false})
     }
   },
+
   setup() {
     const router = useRouter();
 
     const login = () => {
       router.push({ name: 'Login' });
     };
+    const logout = () => {
+      console.log('Пользователь вышел из системы');
+      // Here you can add logic for logging out the user, e.g., clearing tokens
+      // After logout, you might want to redirect to the login page or home page
+    };
 
     return {
       login,
+      logout
     };
   },
   methods: {
@@ -39,12 +47,14 @@ export default {
     
     //   // this.$router.push('/login');
     // },
-    logout() {
-      // Здесь должна быть логика для выхода пользователя из системы
-      // Например, можно вызвать метод API для выхода и затем перенаправить на страницу входа
-      console.log('Пользователь вышел из системы');
-      // this.$router.push('/login');
-    }
+    handleLoginSuccess() {
+      // Emit an event to the parent component to update the `logged` status.
+      this.$emit('update:user', {
+        ...this.user,
+        logged: true,
+      });
+    },
+    
   }
 }
 </script>

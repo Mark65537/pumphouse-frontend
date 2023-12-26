@@ -3,8 +3,8 @@
     <h1>Вход в систему</h1>
     <form @submit.prevent="login">
       <div class="form-group">
-        <label for="username">Имя пользователя:</label>
-        <input type="text" id="username" v-model="credentials.username" required>
+        <label for="name">Имя пользователя:</label>
+        <input type="text" id="username" v-model="credentials.name" required>
       </div>
       <div class="form-group">
         <label for="password">Пароль:</label>
@@ -22,7 +22,7 @@ export default {
   data() {
     return {
       credentials: {
-        username: '',
+        name: '',
         password: ''
       }
     };
@@ -31,27 +31,29 @@ export default {
     login() {
       console.log('Login with:', this.credentials);
       this.authenticateUser();
-      this.redirectToDashboard();
+      this.redirectToHome();
+      this.$emit('login-success');
     },
-    authenticateUser() {
-        const apiUrl = '/api/login';
-        const options = {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify(this.credentials)
-        };
+    async authenticateUser() {
+      const apiUrl = 'http://localhost:8000/api/login';
+      const options = {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(this.credentials)
+      };
 
-        fetch(apiUrl, options)
-          .then(response => response.json())
-          .then(data => {
-            console.log('Authentication successful', data);
-          })
-          .catch(error => {
-            console.error('Authentication error', error);
-          });
+      try {
+        const response = await fetch(apiUrl, options);
+        const data = await response.json();
+
+        console.log('Authentication successful', data);
+        localStorage.setItem('auth-token', data.token);
+      } catch (error) {
+        console.error('Authentication error', error);
+      }
     },
 
-    redirectToDashboard() {
+    redirectToHome() {
       this.$router.push('/');
     }
   }

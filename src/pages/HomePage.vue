@@ -5,16 +5,17 @@
   </div>
 
   <div>
-    <CurrentDateArea />
+    <CurrentDateArea @date-changed="handleDateChange" :initialDate="currentDate"/>
+  </div>
+
+  <div>
+    <EnterTarif :effectiveDate="effectiveDate"/>
   </div>
 
   <div>
     <EnterReadings />
   </div>
 
-  <div>
-    <EnterTarif />
-  </div>
 
   <span>
     <BillTable />
@@ -49,6 +50,26 @@ export default {
     BillTable,
     ResidentsTable,
     TarifTable,
+  },
+  data() {
+    const currentDate = new Date();
+    const year = currentDate.getFullYear();
+    const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+    const day = String(currentDate.getDate()).padStart(2, '0');
+    const formattedDate = `${year}-${month}-${day}`;
+
+    return {
+      effectiveDate: `${year}-${month}`,
+      currentDate: formattedDate,
+    };
+  },
+  methods: {    
+    handleDateChange(newDate) {
+      const date = new Date(newDate);
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      this.effectiveDate = `${year}-${month}`;
+    }
   }
 };
 </script>
