@@ -1,35 +1,42 @@
 <template>
+  <div class="home-page">
+    <div>
+      <TopBar />
+    </div>
 
-  <div>
-    <TopBar />
+    <!-- <div> {{ localStorage.getItem('user-name') }} </div> -->
+
+    <div>
+      <CurrentDateArea 
+        @date-changed="handleDateChange" 
+        :initialDate="currentDate"
+      />
+    </div>
+
+    <div>
+      <EnterTarif :effectiveDate="effectiveDate"/>
+    </div>
+
+    <div>
+      <EnterReadings :prevMonthAndYear="prevMonthAndYear"/>
+    </div>
+
+    <div class = "tables-container">
+      <span>
+        <BillTable />
+      </span>
+
+      <div class = "info-tables-container">
+        <span>
+          <ResidentsTable />    
+        </span>
+
+        <span>
+          <TarifTable />    
+        </span>
+      </div>
+    </div>
   </div>
-
-  <!-- <div> {{ localStorage.getItem('user-name') }} </div> -->
-
-  <div>
-    <CurrentDateArea @date-changed="handleDateChange" :initialDate="currentDate"/>
-  </div>
-
-  <div>
-    <EnterTarif :effectiveDate="effectiveDate"/>
-  </div>
-
-  <div>
-    <EnterReadings :prevMonthAndYear="prevMonthAndYear"/>
-  </div>
-
-
-  <span>
-    <BillTable />
-  </span>
-
-  <span>
-    <ResidentsTable />    
-  </span>
-
-  <span>
-    <TarifTable />    
-  </span>
 
 
 </template>
@@ -85,12 +92,28 @@ export default {
 </script>
 
 <style>
-/* Стили для App.vue */
+
+.tables-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.home-page {
+    font-family: 'Roboto', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-align: center;
+    min-height: 100vh;
+    color: #E6E0E9;
+    font-size: 16px;
+    background: #2B2930;
+}
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
+  /* font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
-  color: #2c3e50;
+  color: #2c3e50; */
 }
 </style>

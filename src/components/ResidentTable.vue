@@ -74,11 +74,6 @@ export default {
 </script>
 
 <style>
-.TableView-container {
-  display: flex;
-  justify-content: flex-end; /* Выравнивание в правой части контейнера */
-  margin: 20px 0;
-}
 
 .loading {
   text-align: center;

@@ -337,7 +337,14 @@ th, td {
 }
 
 th {
-  background-color: #eee;
+  border: none;
+  color: #E8DEF8;
+  margin: 0 2px;
+  max-width: 300px;
+  /* display: inline-block; */
+  background: #5A5A5A;
+  text-align: center;
+  align-items: center;
 }
 
 
