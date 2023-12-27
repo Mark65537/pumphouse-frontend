@@ -115,10 +115,12 @@ export default {
       rowsPerPage: 5,
       rowsPerPageOptions: [5, 10, 50, 100],
 
+      tableRows: this.rows,
       editingRow: {}, // Словарь для отслеживания изменений
       currentlyEditingRowNum: null,
       currentlyEditingRowKey: null,
       selectedRows: [],
+      isNewRow: false,
     };
   },
   
@@ -132,9 +134,11 @@ export default {
       return Math.ceil(this.rows.length / this.rowsPerPage);
     },
     paginatedRows() {
+      // tableRows=this.rows;
       if (!this.rows) {
         // Если rows ещё не определён, возвращаем пустой массив
         return [];
+        // return this.tableRows = this.rows
       }
       const start = (this.currentPage - 1) * this.rowsPerPage;
       const end = start + this.rowsPerPage;
@@ -145,42 +149,19 @@ export default {
   methods: {
     /** Методы для создания и удаления строк */
     createRow() {
-      const newRow = { 
-        'id' : 1,
+      
+      const newRow = {
+        'id': 11,
         'num' : 1, 
         'fio': "John Doe", 
         'area': 123, 
         'start_date': '2023-01-01', 
       };
-      this.paginatedRows.unshift(newRow);
-      this.enableEdit(newRow.id, Object.keys(newRow)[0]); // enable editing for the new row
+      this.$emit('add-row', newRow);
+      this.activateСellEdit(newRow.id, Object.keys(newRow)[2]); 
       this.isNewRow = true;
     },
-    saveNewRow() {
-      // Здесь отправка данных на бэкенд
-      // const newRowData = this.paginatedRows[0];
-      // fetch(apiURL, {
-      //   method: 'POST',
-      //   body: formData,
-      // })
-      // .then(response => {
-      //   if (!response.ok) {
-      //     throw new Error('Network response was not ok');
-      //   }
-      //   return response.json();
-      // })
-      // .then(data => {
-      //   // Обработайте данные, возвращенные бэкендом, если это необходимо
-      //   // Например, добавьте новую строку в таблицу
-      //   this.paginatedRows.push(this.newRowData);
-      //   // Сбросить состояние новой строки
-      //   this.isNewRow = false;
-      //   this.newRowData = { name: '', age: '' }; // сбросить поля
-      // })
-      // .catch(error => {
-      //   console.error('There has been a problem with your fetch operation:', error);
-      // });
-    },
+    
     async deleteSelectedRows() {
       if (this.selectedRows.length === 0) {
         alert('Не выбрано ни одной строки для удаления.'); 
@@ -207,7 +188,7 @@ export default {
 
             const data = await response.json();
 
-            if (!data.success) {
+            if (response.status !== 200) {
               throw new Error(data.message);
             }
           }
@@ -222,6 +203,7 @@ export default {
         }
     },
 
+    // Метод для того что бы не выводился id
     filteredRowKeys(row) {
       return Object.keys(row).filter(key => key !== 'id');
     },
@@ -242,7 +224,13 @@ export default {
         if (!this.editingRow[rowId]) {
           this.editingRow[rowId] = {};
         }
-        this.editingRow[rowId][key] = this.rows.find(row => row.id === rowId)[key];
+
+        const row = this.rows.find(row => row.id === rowId);
+        if (row) {
+          this.editingRow[rowId][key] = row[key];
+        } else {
+          console.log('Error: Row with ID not found ', row.id);
+        }
 
         this.currentlyEditingRowNum = rowId;
         this.currentlyEditingRowKey = key;
@@ -259,21 +247,43 @@ export default {
       this.currentlyEditingRowNum = null;
       this.currentlyEditingRowKey = null;
     },
+
     async saveEdits(rowId) {
       const updatedRow = this.editingRow[rowId];
       try {
-        await this.updateRow(rowId, updatedRow); // Метод для отправки изменений на сервер
-        Object.assign(this.rows.find(row => row.id === rowId), updatedRow);
-        if (this.editingRow[rowId]) {
-          delete this.editingRow[rowId];
+        if (this.isNewRow) {
+          await this.saveNewRow(updatedRow);
+        } else {
+          await this.updateRow(rowId, updatedRow);
+          Object.assign(this.rows.find(row => row.id === rowId), updatedRow);
+          if (this.editingRow[rowId]) {
+            delete this.editingRow[rowId];
+          }
         }
       } catch (error) {
         console.error('Ошибка при сохранении:', error);
       }
       this.currentlyEditingRowNum = null;
+      this.currentlyEditingRowKey = null;
+      this.isNewRow = false;
+    },
+    async saveNewRow(row) {
+      try {
+          const response = await fetch('http://localhost:8000/api/residents', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(row),
+          });
+          if (!response.ok) {
+            throw new Error('Failed to create new row');
+          }
+      } catch (error) {
+        console.error('Failed to create new row:', error);
+      }
     },
     async updateRow(rowId, updatedRow) {
-      // Здесь должен быть код для отправки изменений на сервер
       console.log('Отправка изменений на сервер:', rowId, updatedRow);
       try {
         const response = await fetch(

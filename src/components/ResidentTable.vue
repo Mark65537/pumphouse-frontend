@@ -10,6 +10,7 @@
         :isEditable="isEditable" 
         :headers="headers" 
         :rows="items"
+        @add-row="handleAddRow"
         @delete-rows="handleDeleteRows"      
       />
     
@@ -39,8 +40,20 @@ export default {
     this.fetchItems();
   },
   methods: {
+    async handleAddRow(newRow) {
+      const response = await fetch('http://localhost:8000/api/residents');
+      console.log('response: ', response);
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      const data = await response.json();
+      const maxId = data[data.length - 1].id;
+      newRow.id = maxId + 1;
+
+      this.items = [newRow, ...this.items];
+    },
     handleDeleteRows(idsToDelete) {
-      this.rows = this.rows.filter(row => !idsToDelete.includes(row.id));
+      this.items = this.items.filter(row => !idsToDelete.includes(row.id));
     },
     fetchItems() {
         fetch('http://localhost:8000/api/residents')
