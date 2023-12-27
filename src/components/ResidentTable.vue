@@ -40,17 +40,27 @@ export default {
     this.fetchItems();
   },
   methods: {
-    async handleAddRow(newRow) {
-      const response = await fetch('http://localhost:8000/api/residents');
-      console.log('response: ', response);
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-      const data = await response.json();
-      const maxId = data[data.length - 1].id;
-      newRow.id = maxId + 1;
+    handleAddRow(newRow) {
+      try{
+        var request = new XMLHttpRequest();
+        request.open('GET', 'http://localhost:8000/api/residents', false);  // `false` делает запрос синхронным
+        request.send(null);
 
-      this.items = [newRow, ...this.items];
+        if (request.status === 200) {
+          // console.log(request.json());
+          const data = JSON.parse(request.responseText);
+          const maxId = data[data.length - 1].id;
+          newRow.id = maxId + 1;
+          this.items = [newRow, ...this.items];    
+        }
+          // fetch('http://localhost:8000/api/residents')
+          //   .then(response => this.validateResponse(response))
+          //   .then(data => this.processItems(data))
+          //   .catch(error => this.handleFetchError(error));
+        console.log('handleAddRow: ', newRow);
+      } catch (error) {
+        console.error('Error sending add request:', error);
+      }
     },
     handleDeleteRows(idsToDelete) {
       this.items = this.items.filter(row => !idsToDelete.includes(row.id));
@@ -63,6 +73,7 @@ export default {
     },
 
     validateResponse(response) {
+      console.log('handleAddRow response: ', response.status);
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }

@@ -158,10 +158,35 @@ export default {
         'start_date': '2023-01-01', 
       };
       this.$emit('add-row', newRow);
-      this.activateСellEdit(newRow.id, Object.keys(newRow)[2]); 
+      this.editingRow[newRow.id] = {};
+      this.editingRow[newRow.id] = newRow;
+      this.currentlyEditingRowNum = newRow.id;
+      // this.activateСellEdit(newRow.id, Object.keys(newRow)[2]); 
       this.isNewRow = true;
     },
-    
+    activateСellEdit(rowId, key) {
+      if ((this.currentlyEditingRowNum === null || 
+              this.currentlyEditingRowNum === rowId) &&
+          (this.currentlyEditingRowKey === null || 
+              this.currentlyEditingRowKey === key)) { // Если ни одна строка не редактируется или редактируется эта строка
+        
+        if (!this.editingRow[rowId]) {
+          this.editingRow[rowId] = {};
+        }
+
+        const row = this.rows.find(row => row.id === rowId);
+        if (row) {
+          this.editingRow[rowId][key] = row[key];
+        } else {
+          console.log('Error: Row with ID not found ', row.id);
+        }
+
+        this.currentlyEditingRowNum = rowId;
+        this.currentlyEditingRowKey = key;
+
+      }
+      console.log("enableEdit", rowId, key);
+    },
     async deleteSelectedRows() {
       if (this.selectedRows.length === 0) {
         alert('Не выбрано ни одной строки для удаления.'); 
@@ -215,29 +240,7 @@ export default {
     isRowBeingEdited(rowId) {
       return this.currentlyEditingRowNum === rowId;
     },
-    activateСellEdit(rowId, key) {
-      if ((this.currentlyEditingRowNum === null || 
-              this.currentlyEditingRowNum === rowId) &&
-          (this.currentlyEditingRowKey === null || 
-              this.currentlyEditingRowKey === key)) { // Если ни одна строка не редактируется или редактируется эта строка
-        
-        if (!this.editingRow[rowId]) {
-          this.editingRow[rowId] = {};
-        }
-
-        const row = this.rows.find(row => row.id === rowId);
-        if (row) {
-          this.editingRow[rowId][key] = row[key];
-        } else {
-          console.log('Error: Row with ID not found ', row.id);
-        }
-
-        this.currentlyEditingRowNum = rowId;
-        this.currentlyEditingRowKey = key;
-
-      }
-      console.log("enableEdit", rowId, key);
-    },
+    
 
     /** Методы для кнопок редактирования строк */ 
     cancelEdit(rowId) {
@@ -255,11 +258,12 @@ export default {
           await this.saveNewRow(updatedRow);
         } else {
           await this.updateRow(rowId, updatedRow);
-          Object.assign(this.rows.find(row => row.id === rowId), updatedRow);
-          if (this.editingRow[rowId]) {
+          Object.assign(this.rows.find(row => row.id === rowId), updatedRow);          
+        }
+
+        if (this.editingRow[rowId]) {
             delete this.editingRow[rowId];
           }
-        }
       } catch (error) {
         console.error('Ошибка при сохранении:', error);
       }
