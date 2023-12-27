@@ -40,6 +40,11 @@ export default {
     this.fetchItems();
   },
   methods: {
+    /**
+    * Добавляет новую строку в this.items, не добавляя элемент в базу данных
+    * ВНИМАНИЕ: не делать эту функцию асинхронной 
+    * @param {Object} newRow - The new row to add.
+    */
     handleAddRow(newRow) {
       try{
         var request = new XMLHttpRequest();
@@ -47,7 +52,6 @@ export default {
         request.send(null);
 
         if (request.status === 200) {
-          // console.log(request.json());
           const data = JSON.parse(request.responseText);
           const maxId = data[data.length - 1].id;
           newRow.id = maxId + 1;

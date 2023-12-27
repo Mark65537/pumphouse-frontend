@@ -1,8 +1,10 @@
 <template>
   <div>
     <p>Текущая дата: 
-    <input type="date" v-model="date" @input="updateDate"></p>
-    <!-- <p>Текущая дата: {{ date }}</p> Ипользуеться для отладки-->
+    <!-- {{ date }} --> <!-- расскоментируй если нужен просто вывод даты -->
+    <input type="date" v-model="date" @input="updateDate"> <!-- закоментируй если нужено изменять текущую дату -->
+    </p>
+
   </div>
 </template>
 

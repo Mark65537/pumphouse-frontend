@@ -372,7 +372,7 @@ export default {
 table {
   border-collapse: collapse;
   border: 1px solid #ddd; /* Рамка вокруг всей таблицы */
-  margin-left: auto; /* Для выравнивания таблицы справа */
+  width: 100%; /* Ширина таблицы равна 100% родительского контейнера */
 }
 
 th, td {
