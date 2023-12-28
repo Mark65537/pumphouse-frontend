@@ -28,13 +28,12 @@ export default {
     };
   },
   methods: {
-    login() {
-      console.log('Login with:', this.credentials);
-      this.authenticateUser();
+    async login() {
+      console.log('Login with name: ', this.credentials.name);
+      await this.authenticateUser();
       this.redirectToHome();
-      this.$emit('login-success');
     },
-    authenticateUser() {
+    async authenticateUser() {
       const apiUrl = 'http://localhost:8000/api/login';
       const options = {
         method: 'POST',
@@ -43,8 +42,8 @@ export default {
       };
 
       try {
-        const response = fetch(apiUrl, options);
-        const data = response.json();
+        const response = await fetch(apiUrl, options);
+        const data = await response.json();
 
         console.log('Authentication successful', data);
         localStorage.setItem('auth-token', data.token);

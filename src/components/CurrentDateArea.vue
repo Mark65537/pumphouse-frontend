@@ -1,8 +1,8 @@
 <template>
   <div>
     <p>Текущая дата: 
-    <!-- {{ date }} --> <!-- расскоментируй если нужен просто вывод даты -->
-    <input type="date" v-model="date" @input="updateDate"> <!-- закоментируй если нужено изменять текущую дату -->
+    <input v-if="isEditableDate" type="date" v-model="date" @input="updateDate"> <!-- закоментируй если нужено изменять текущую дату -->
+    <label v-else>{{ date }}</label>  <!-- расскоментируй если нужен просто вывод даты -->
     </p>
 
   </div>
@@ -13,6 +13,9 @@ export default {
   props: {
     initialDate: {
       type: String,
+    },
+    isEditableDate: {
+      type: Boolean,
     }
   },
   data() {

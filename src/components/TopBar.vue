@@ -1,9 +1,9 @@
 <template>
   <div class="top-bar">
     <div class="user-info">
-      <span v-if="userLogged">{{ user.name }}</span>
+      <span v-if="userLogged === true">{{ userName }}</span>
     </div>
-    <button v-if="!userLogged" @click="login">Вход</button>
+    <button v-if="userLogged === false" @click="login">Вход</button>
     <button v-else @click="logout">Выход</button>
   </div>
 </template>
@@ -12,22 +12,10 @@
 
 
 export default {
-
-  props: {
-    user: {
-      type: Object,
-      default: () => ({ 
-        name: "Админ", 
-        logged: localStorage.getItem('auth-token') !== null
-      })
-    }
-  },
   data() {
     return {
-      userLogged: {
-        type: Boolean,
-        default: this.user.logged
-      } 
+      userName: "Админ",
+      userLogged: localStorage.getItem('auth-token') !== null      
     };
   },
   methods: {
@@ -35,9 +23,9 @@ export default {
       this.$router.push({ name: 'Login' });
     },
     logout(){
-      localStorage.removeItem('auth-token'); // Remove the auth-token from localStorage
+      localStorage.removeItem('auth-token'); // удаление auth-token из localStorage
       console.log('Пользователь вышел из системы');
-
+      this.$emit('logout');
       this.userLogged = false;
     }  
   }

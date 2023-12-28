@@ -1,7 +1,9 @@
 <template>
   <div class="home-page">
     <div>
-      <TopBar />
+      <TopBar 
+        @logout="handleLogout"
+      />
     </div>
 
     <!-- <div> {{ localStorage.getItem('user-name') }} </div> -->
@@ -10,15 +12,18 @@
       <CurrentDateArea 
         @date-changed="handleDateChange" 
         :initialDate="currentDate"
+        :isEditableDate="isEditableDate"
       />
     </div>
 
-    <div>
-      <EnterTarif :effectiveDate="effectiveDate"/>
-    </div>
+    <div v-if="isUserLogged">
+      <div>
+        <EnterTarif :effectiveDate="effectiveDate"/>
+      </div>
 
-    <div>
-      <EnterReadings :prevMonthAndYear="prevMonthAndYear"/>
+      <div>
+        <EnterReadings :prevMonthAndYear="prevMonthAndYear"/>
+      </div>
     </div>
 
     <div class = "tables-container">
@@ -74,6 +79,12 @@ export default {
       effectiveDate: `${year}-${month}`,
       currentDate: `${year}-${month}-${day}`,
       prevMonthAndYear: `${prevMonth} ${year}`,
+      isEditableDate: true,
+      isUserLogged: {
+        type: Boolean,
+        default: localStorage.getItem('auth-token') !== null,
+      }
+
     };
   },
   methods: {    
@@ -86,6 +97,10 @@ export default {
 
       this.effectiveDate = `${year}-${month}`;
       this.prevMonthAndYear = `${prevMonth} ${year}`;
+    },
+    handleLogout() {
+      this.isEditableDate = false;
+      this.isUserLogged = false;
     }
   }
 };
