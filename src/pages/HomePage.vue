@@ -16,7 +16,7 @@
       />
     </div>
 
-    <div v-if="isUserLogged">
+    <div v-if="isUserLogged === true">
       <div>
         <EnterTarif :effectiveDate="effectiveDate"/>
       </div>
@@ -33,7 +33,9 @@
 
       <div class = "info-tables-container">
         <span>
-          <ResidentsTable />    
+          <ResidentsTable 
+            :isEditable="isUserLogged"
+          />    
         </span>
 
         <span>
@@ -80,10 +82,7 @@ export default {
       currentDate: `${year}-${month}-${day}`,
       prevMonthAndYear: `${prevMonth} ${year}`,
       isEditableDate: true,
-      isUserLogged: {
-        type: Boolean,
-        default: localStorage.getItem('auth-token') !== null,
-      }
+      isUserLogged: localStorage.getItem('auth-token') !== null
 
     };
   },

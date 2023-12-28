@@ -26,10 +26,17 @@ export default {
    components: {
        TableView
    },
+   props: {
+    isEditable: {
+      type: Boolean,
+      default: true
+    },
+   },
    data() {
-    return {
-        tableTitle: 'Список дачников',
-        isEditable: true,
+    console.log('ResidentTable.vue: data(): ', this.isEditable);
+    return {      
+        // isEditableTable: this.isEditable,
+        tableTitle: 'Список дачников',        
         headers: ['#', 'ФИО', 'Площадь', 'Дата регистрации', /* ... другие заголовки ... */],
         items: [],
         loaded: false,
